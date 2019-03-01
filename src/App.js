@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './css/pure-min.css';
 import './css/side-menu.css';
-import $ from 'jquery';
-import InputCustomizado from './componentes/InputCustomizado';
 import {FormularioAutor,TabelaAutores} from './Autor';
+import AutorBox from './Autor';
+
 
 class App extends Component {
     render() {
@@ -33,8 +32,7 @@ class App extends Component {
 						<div id="main">
 						</div>
 						<div className="content" id="content">
-                            <FormularioAutor/>
-                            <TabelaAutores/>
+                            <AutorBox/>
 						</div>
 					</div>
 				</div>
