@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
 import InputCustomizado from './componentes/InputCustomizado';
+import PubSub from 'pubsub-js';
+import TratadorErros from './TratadorErros';
 
 class FormularioAutor extends Component{
 
@@ -34,12 +36,18 @@ class FormularioAutor extends Component{
           dataType:'json',
           type:'post',
           data: JSON.stringify({nome:this.state.nome,email:this.state.email,senha:this.state.senha}),
-          success: function(resposta){
-              this.props.callbackAtualizaListagem(resposta);
+          success: function(novaListagem){
+			PubSub.publish('atualiza-lista-autores',novaListagem);
+			this.setState({nome:'',email:'',senha:''});
           }.bind(this),
-          error: function(resposta){
-              console.log("erro");
-          }      
+          	error: function(resposta){
+				if(resposta.status === 400){
+					new TratadorErros().publicaErros(resposta.responseJSON);
+				  }
+			},
+			  	beforeSend:function(){
+					PubSub.publish("limpa-erros",{});
+			  	}      
          });
        }
     
@@ -95,10 +103,9 @@ export default class AutorBox extends Component{
     constructor(){
 		super();
 		this.state = {lista :[]};
-        this.atualizaListagem = this.atualizaListagem.bind(this);
 	}
 
-	 componentWillMount(){
+	 componentDidMount(){
          $.ajax({
       		url:"https://cdc-react.herokuapp.com/api/autores",
       		dataType: 'json',
@@ -106,17 +113,28 @@ export default class AutorBox extends Component{
         		 this.setState({lista:resposta});
       		}.bind(this)
     	});
+		PubSub.subscribe('atualiza-lista-autores', function(topico,novaListagem){
+			this.setState({lista:novaListagem});
+		}.bind(this));
 	}
+	
 
-    atualizaListagem(novaLista) {
-        this.setState({lista:novaLista});
-    }
+    // atualizaListagem(novaLista) {
+    //     this.setState({lista:novaLista});
+    // }
 
     render() {
         return(
           <div>
-            <FormularioAutor callbackAtualizaListagem = {this.atualizaListagem}/>
-            <TabelaAutores lista={this.state.lista}/>
+			  <div className="header">
+				<h1>Cadastro De autores</h1>
+				<div id="main">
+				</div>
+				<div className="content" id="content">
+            		<FormularioAutor/>
+            		<TabelaAutores lista={this.state.lista}/>
+				</div>
+			</div>
           </div>
         );
     }
