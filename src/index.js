@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import AutorBox from './Autor';
 import Home from './home';
+import LivroBox from './Livro';
 import {browserHistory,Router,Route,IndexRoute} from 'react-router';
 import * as serviceWorker from './serviceWorker';
 
@@ -12,7 +13,7 @@ ReactDOM.render(
       <Route path="/" component={App}>
         <IndexRoute component={Home}/>
         <Route path="/autor" component={AutorBox}></Route>
-        <Route path="/livro" ></Route>
+        <Route path="/livro" component={LivroBox}></Route>
       </Route>
     </Router>),
     document.getElementById('root')
